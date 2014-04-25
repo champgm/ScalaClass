@@ -1,6 +1,7 @@
 package example
 
 import common._
+import scala.annotation.tailrec
 
 object Lists {
   /** This method computes the sum of all elements in the list xs. There are
