@@ -1,5 +1,4 @@
 package recfun
-import common._
 
 object Main {
   def main(args: Array[String]) {
@@ -20,13 +19,8 @@ object Main {
   /** Exercise 2
     */
   def balance(chars: List[Char]): Boolean = {
-
-      def op(char: Char): Boolean = {
-        char == '('
-      }
-      def cl(char: Char): Boolean = {
-        char == ')'
-      }
+      def op(char: Char): Boolean = char == '('
+      def cl(char: Char): Boolean = char == ')'
 
       def innerBalance(chars: List[Char], openCount: Int): Boolean = {
         chars match {
@@ -41,10 +35,17 @@ object Main {
           case _ => false
         }
       }
-
     innerBalance(chars, 0)
   }
   /** Exercise 3
     */
-  def countChange(money: Int, coins: List[Int]): Int = ???
+  def countChange(money: Int, coins: List[Int]): Int = {
+    if (money < 0) 0
+    else if (money == 0) 1
+    else
+      coins match {
+        case Nil => 0
+        case head :: tail => countChange(money, tail) + countChange(money - head, coins)
+      }
+  }
 }
