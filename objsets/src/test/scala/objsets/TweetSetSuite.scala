@@ -16,6 +16,8 @@ class TweetSetSuite extends FunSuite {
     val set4c = set3.incl(c)
     val set4d = set3.incl(d)
     val set5 = set4c.incl(d)
+
+    val macSet = set1.incl(new Tweet("mac", "some text", 40)).incl(new Tweet("mac", "more text", 20)).incl(new Tweet("mac", "lotsof text", 90))
   }
 
   def asSet(tweets: TweetSet): Set[Tweet] = {
@@ -47,6 +49,16 @@ class TweetSetSuite extends FunSuite {
   test("union: set4c and set4d") {
     new TestSets {
       assert(size(set4c.union(set4d)) === 4)
+    }
+  }
+  test("union: printlns"){
+    new TestSets {
+      println(set4c)
+      println(macSet)
+      println()
+      println(set4c.union(macSet))
+      println(macSet.union(set4c))
+      assert(size(set4c.union(macSet)) === 6)
     }
   }
 

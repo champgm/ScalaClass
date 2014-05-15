@@ -7,7 +7,8 @@ import TweetReader._
   */
 class Tweet(val user: String, val text: String, val retweets: Int) {
   override def toString: String =
-    "User: " + user + "\n" +
+    "User: " + user +
+      //"User: " + user + "\n" +
       "Text: " + text + " [" + retweets + "]"
 }
 
@@ -96,6 +97,7 @@ abstract class TweetSet {
 }
 
 class Empty extends TweetSet {
+  override def toString = "."
 
   def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = acc
 
@@ -122,19 +124,23 @@ class Empty extends TweetSet {
 
 class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
 
+  override def toString = "{" + left + elem + right + "}"
+
   def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet =
     if (p(elem)) left.filterAcc(p, right.filterAcc(p, acc.incl(elem)))
     else left.filterAcc(p, right.filterAcc(p, acc))
-
-  // def filter(p: Tweet => Boolean): TweetSet = filterAcc(p, new Empty)
 
   def union(that: TweetSet): TweetSet = {
     //this is ultra inefficient
     //((left.union(right)).union(that)).incl(elem)
 
     //some research shows that this way is pretty good
-    that.foreach(element => this.incl(element))
-    this
+    //that.foreach(element => this.incl(element))
+    //this
+    //"this" is not mutable, so this method  doesn't actually do anything
+
+    //... Why not just use filter's accumulation? That seems efficientish.
+    left.filterAcc(_ => true, right.filterAcc(_ => true, that.incl(elem)))
   }
 
   def mostRetweeted: Tweet = List(left.mostRetweeted, right.mostRetweeted, elem).maxBy(_.retweets)
@@ -196,28 +202,19 @@ class Cons(val head: Tweet, val tail: TweetList) extends TweetList {
 
 object GoogleVsApple {
 
-  def searchTweets(toSearch: TweetSet, keyWords: List[String]): TweetSet = {
-    var acc: TweetSet = new Empty
-    toSearch.foreach(element => {
-      keyWords.foreach(keyWord => {
-        if (element.text.contains(keyWord))
-          acc = acc.incl(element)
-      })
-    })
-    acc
-  }
+  def searchText(text: String, terms: List[String]): Boolean = terms.find(item => text.contains(item)).isDefined
 
   lazy val google = List("android", "Android", "galaxy", "Galaxy", "nexus", "Nexus")
   lazy val apple = List("ios", "iOS", "iphone", "iPhone", "ipad", "iPad")
 
   lazy val allTweets = TweetReader.allTweets
-  lazy val googleTweets: TweetSet = searchTweets(allTweets, google)
-  lazy val appleTweets: TweetSet = searchTweets(allTweets, apple)
+  lazy val appleTweets = allTweets.filter(element => apple.find(item => element.text.contains(item)).isDefined)
+  lazy val googleTweets = allTweets.filter(element => google.find(item => element.text.contains(item)).isDefined)
 
   /** A list of all tweets mentioning a keyword from either apple or google,
     * sorted by the number of retweets.
     */
-  lazy val trending: TweetList = googleTweets.union(appleTweets).descendingByRetweet
+  lazy val trending: TweetList = appleTweets.union(googleTweets).descendingByRetweet
 }
 
 object Main extends App {
