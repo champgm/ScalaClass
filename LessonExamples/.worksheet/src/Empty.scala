@@ -3,11 +3,11 @@ abstract class IntSet {
   def contains(x: Int): Boolean
   def union(other: IntSet): IntSet
 }
-class Empty extends IntSet {
-  def contains(x: Int): Boolean = false
-  def include(x: Int): IntSet = new NonEmpty(x, new Empty, new Empty)
-  def union(other: IntSet): IntSet = other
-  override def toString = "."
+object Empty extends IntSet {;import org.scalaide.worksheet.runtime.library.WorksheetSupport._; def main(args: Array[String])=$execute{;$skip(192); 
+  def contains(x: Int): Boolean = false;System.out.println("""contains: (x: Int)Boolean""");$skip(64); 
+  def include(x: Int): IntSet = new NonEmpty(x,  Empty,  Empty);System.out.println("""include: (x: Int)IntSet""");$skip(43); 
+  def union(other: IntSet): IntSet = other;System.out.println("""union: (other: IntSet)IntSet""")}
+  //override def toString = "."
 }
 class NonEmpty(element: Int, left: IntSet, right: IntSet) extends IntSet {
   def contains(x: Int): Boolean = {
@@ -26,11 +26,10 @@ class NonEmpty(element: Int, left: IntSet, right: IntSet) extends IntSet {
   override def toString = "{" + left + element + right + "}"
 }
 object Lesson0301 {
-  println("Welcome to the Scala worksheet")       //> Welcome to the Scala worksheet
+  println("Welcome to the Scala worksheet")
 
-  val tree1 = new NonEmpty(3, new Empty, new Empty)
-                                                  //> tree1  : NonEmpty = {.3.}
-  val tree2 = tree1.include(4)                    //> tree2  : IntSet = {.3{.4.}}
+  val tree1 = new NonEmpty(3,  Empty,  Empty)
+  val tree2 = tree1.include(4)
 
   //
 
