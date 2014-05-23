@@ -70,6 +70,7 @@ object FunSets {
     */
   def map(s: Set, f: Int => Int): Set = { element => { exists(s, { pTest => f(pTest) == element }) } }
 
+  def map2(s: Set, f: Int => Int): Set = { element => exists(s, pTest => f(pTest) == element) }
   /** Displays the contents of a set
     */
   def toString(s: Set): String = {

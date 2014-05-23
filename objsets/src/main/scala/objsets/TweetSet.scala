@@ -142,6 +142,7 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
     //... Why not just use filter's accumulation? That seems efficientish.
     left.filterAcc(_ => true, right.filterAcc(_ => true, that.incl(elem)))
   }
+  //override def union(other: TweetSet) = filterAcc((tweet) => !other.contains(tweet), other)
 
   def mostRetweeted: Tweet = List(left.mostRetweeted, right.mostRetweeted, elem).maxBy(_.retweets)
 

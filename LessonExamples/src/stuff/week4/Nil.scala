@@ -2,8 +2,8 @@ package week4
 
 import java.util.NoSuchElementException
 
-class Nil[T] extends List[T] {
-  def head: T = throw new NoSuchElementException("No head on Nil")
+object Nil extends List[Nothing] {
   def isEmpty: Boolean = true
-  def tail: List[T] = throw new NoSuchElementException("No tail on Nil")
+  def tail: List[Nothing] = throw new NoSuchElementException("No tail on Nil")
+  def head: Nothing = throw new NoSuchElementException("No head on Nil")
 }
