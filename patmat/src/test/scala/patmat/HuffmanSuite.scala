@@ -16,9 +16,9 @@ class HuffmanSuite extends FunSuite {
 
   test("sort leaves"){
     val timesList = times(List('h', 'u', 'f', 'f', 'm', 'a', 'n', 'e', 's', 't', 'c', 'o', 'o', 'l', 'm', 'm', 'm', 'a', 'a', 'c'))
-    println(timesList)
-    println(makeOrderedLeafList(timesList))
-    println()
+    //    println(timesList)
+    //    println(makeOrderedLeafList(timesList))
+    //    println()
   }
 
   test("weight of a larger tree") {
@@ -48,9 +48,9 @@ class HuffmanSuite extends FunSuite {
 
   test("check example code"){
     val testTree = createCodeTree(List[Char]('m', 'm', 'm', 'a', 'a', 'c'))
-    println(testTree)
-    println(decode(testTree, List(1, 0, 1, 0, 0)))
-    println()
+    //    println(testTree)
+    //    println(decode(testTree, List(1, 0, 1, 0, 0)))
+    //    println()
   }
 
   test("decode and encode a very short text should be identity") {
@@ -61,10 +61,27 @@ class HuffmanSuite extends FunSuite {
 
   test("check quickEncode"){
     val testTree = createCodeTree(List[Char]('m', 'm', 'm', 'a', 'a', 'c'))
-    println(convert(testTree))
+    //    println(convert(testTree))
   }
 
   test("test quickencode"){
     assert(quickEncode(frenchCode)(List('h', 'u', 'f', 'f', 'm', 'a', 'n', 'e', 's', 't', 'c', 'o', 'o', 'l')) === List(0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1))
+  }
+
+  test("official combine test"){
+    println("===Bad Test===")
+    val chars = string2Chars("aabbbdddd")
+    val tree = createCodeTree(chars)
+
+    println(tree.toString())
+    println("Fork(Fork(Leaf(a,2),Leaf(b,3),List(a, b),5),Leaf(d,4),List(a, b, d),9)")
+    assert (tree.toString() === "Fork(Fork(Leaf(a,2),Leaf(b,3),List(a, b),5),Leaf(d,4),List(a, b, d),9)")
+    println("==============")
+  }
+
+  test("offical times test"){
+    val chars = string2Chars("kkdrrrbbbbaaaaa")
+    val timesVal = times(chars)
+    assert (timesVal === List(('a', 5), ('b', 4), ('r', 3), ('k', 2), ('d', 1)))
   }
 }

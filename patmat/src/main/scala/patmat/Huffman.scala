@@ -45,9 +45,9 @@ object Huffman {
       // Fork(left, right, chars(left) ::: chars(right), weight(left) + weight(right))
       def innerMakeCodeTree(trees: List[CodeTree]): CodeTree = {
         trees match {
-          case first :: second :: rest => innerMakeCodeTree(sortTrees(Fork(first, second, chars(left) ::: chars(right), weight(left) + weight(right)) :: rest))
+          case first :: second :: rest => innerMakeCodeTree(Fork(first, second, chars(first) ::: chars(second), weight(first) + weight(second)) :: rest)
           case first :: Nil => first
-          case Nil => null
+          case Nil => throw new Error("Cannot combine an empty list of trees")
         }
       }
     innerMakeCodeTree(sortTrees(getLeaves(left) ++ getLeaves(right)))
@@ -94,7 +94,12 @@ object Huffman {
     }
   }
 
-  def times(chars: List[Char]): List[(Char, Int)] = runLengthEncoding[Char](chars)
+  def times(chars: List[Char]): List[(Char, Int)] = {
+    val map = runLengthEncoding[Char](chars).toMap
+    val groupedMap = map.groupBy(_._1)
+    val squashedCounts = groupedMap.mapValues(_.map(_._2).sum).toList
+    sort(squashedCounts).reverse
+  }
 
   /** Returns a list of `Leaf` nodes for a given frequency table `freqs`.
     *
@@ -116,14 +121,7 @@ object Huffman {
 
   /** Checks whether the list `trees` contains only one single code tree.
     */
-  def singleton(trees: List[CodeTree]): Boolean = {
-    trees.length == 1
-    //    if (trees.length != 1) false
-    //    else trees(0) match {
-    //      case Fork(_, _, _, _) => false
-    //      case Leaf(_, _) => true
-    //    }
-  }
+  def singleton(trees: List[CodeTree]): Boolean = trees.length == 1
 
   /** The parameter `trees` of this function is a list of code trees ordered
     * by ascending weights.
@@ -150,8 +148,8 @@ object Huffman {
 
   def combine(trees: List[CodeTree]): List[CodeTree] = {
     if (trees.length < 1) trees
-    else trees match {
-      case head :: second :: tail => sortTrees(List(makeCodeTree(head, second)) ::: tail)
+    else sortTrees(trees) match {
+      case head :: second :: tail => List(makeCodeTree(head, second)) ::: tail
       case head :: Nil => List(head)
       case Nil => Nil
     }
@@ -175,7 +173,10 @@ object Huffman {
     */
   def until(thisIsTrue: List[CodeTree] => Boolean, doThis: List[CodeTree] => List[CodeTree])(trees: List[CodeTree]): List[CodeTree] = {
     if (thisIsTrue(trees)) trees
-    else until(thisIsTrue, doThis)(doThis(trees))
+    else {
+      println("Until: recieved this non-singleton list: " + trees)
+      until(thisIsTrue, doThis)(doThis(trees))
+    }
   }
 
   /** This function creates a code tree which is optimal to encode the text `chars`.
@@ -184,8 +185,12 @@ object Huffman {
     * frequencies from that text and creates a code tree based on them.
     */
   def createCodeTree(chars: List[Char]): CodeTree = {
+    println("create: Will create tree from list: " + chars)
     val sortedLeaves = makeOrderedLeafList(times(chars))
-    until(leaves => singleton(leaves), leaves => combine(leaves))(sortedLeaves).head
+    println("create: Sorting them and creating leaves, first: " + sortedLeaves)
+    val result = until(leaves => singleton(leaves), leaves => combine(leaves))(sortedLeaves).head
+    println("create: Result: " + result)
+    result
   }
 
   // Part 3: Decoding
