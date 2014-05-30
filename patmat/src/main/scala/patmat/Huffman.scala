@@ -16,42 +16,7 @@ object Huffman {
     * present in the leaves below it. The weight of a `Fork` node is the sum of the weights of these
     * leaves.
     */
-  abstract class CodeTree {
-    def toString(levelString: String): String = {
-      this match {
-        case Leaf(char, weight) => levelString + char + " , " + weight + "\n"
-        case Fork(left, right, chars, weight) => {
-          levelString + chars + " , " + weight + "\n"
-          left.toString(levelString + "- ") + right.toString(levelString + "- ")
-        }
-      }
-    }
-    def innerToString(prepend: String, depth: Int): String = {
-      var space = "          "
-      var dash = "---------"
-      var spacer = ""
-      for (a <- 1 to depth - 1) {
-        spacer = spacer + space
-      }
-
-      this match {
-        case Leaf(char, weight) => {
-          "o '" + char + "': " + weight
-        }
-        case Fork(left, right, chars, weight) => {
-          //prepend + 
-          "+ Fork Node" + "\n" +
-            prepend + "|\n" +
-            prepend + "|\n" +
-            prepend + "+" + dash + right.innerToString(prepend + space, depth + 1) + "\n" +
-            prepend + "|\n" +
-            prepend + "|\n" +
-            prepend + "+" + dash + left.innerToString(prepend + space, depth + 1) + "\n"
-        }
-      }
-    }
-    def toString(depth: Int): String = innerToString("", 0)
-  }
+  abstract class CodeTree
   case class Fork(left: CodeTree, right: CodeTree, chars: List[Char], weight: Int) extends CodeTree
   case class Leaf(char: Char, weight: Int) extends CodeTree
 
@@ -66,9 +31,27 @@ object Huffman {
     case Fork(left, right, chars, weight) => chars
     case Leaf(char, weight) => List(char)
   }
-  def makeCodeTree(left: CodeTree, right: CodeTree) =
-    Fork(left, right, chars(left) ::: chars(right), weight(left) + weight(right))
 
+  def getLeaves(fullTree: CodeTree): List[CodeTree] = {
+      def buildList(subTree: CodeTree): List[CodeTree] = {
+        subTree match {
+          case Leaf(_, _) => List(subTree)
+          case Fork(left, right, chars, weight) => getLeaves(left) ++ getLeaves(right)
+        }
+      }
+    buildList(fullTree)
+  }
+  def makeCodeTree(left: CodeTree, right: CodeTree): CodeTree = {
+      // Fork(left, right, chars(left) ::: chars(right), weight(left) + weight(right))
+      def innerMakeCodeTree(trees: List[CodeTree]): CodeTree = {
+        trees match {
+          case first :: second :: rest => innerMakeCodeTree(sortTrees(Fork(first, second, chars(left) ::: chars(right), weight(left) + weight(right)) :: rest))
+          case first :: Nil => first
+          case Nil => null
+        }
+      }
+    innerMakeCodeTree(sortTrees(getLeaves(left) ++ getLeaves(right)))
+  }
   // Part 2: Generating Huffman trees
 
   /** In this assignment, we are working with lists of characters. This function allows
@@ -169,8 +152,8 @@ object Huffman {
     if (trees.length < 1) trees
     else trees match {
       case head :: second :: tail => sortTrees(List(makeCodeTree(head, second)) ::: tail)
-      case head :: second :: Nil => List(makeCodeTree(head, second))
-      case _ => ???
+      case head :: Nil => List(head)
+      case Nil => Nil
     }
   }
 

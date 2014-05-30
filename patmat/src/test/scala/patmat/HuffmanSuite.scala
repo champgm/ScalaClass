@@ -14,6 +14,13 @@ class HuffmanSuite extends FunSuite {
     val t2 = Fork(Fork(Leaf('a', 2), Leaf('b', 3), List('a', 'b'), 5), Leaf('d', 4), List('a', 'b', 'd'), 9)
   }
 
+  test("sort leaves"){
+    val timesList = times(List('h', 'u', 'f', 'f', 'm', 'a', 'n', 'e', 's', 't', 'c', 'o', 'o', 'l', 'm', 'm', 'm', 'a', 'a', 'c'))
+    println(timesList)
+    println(makeOrderedLeafList(timesList))
+    println()
+  }
+
   test("weight of a larger tree") {
     new TestTrees {
       assert(weight(t1) === 5)
@@ -44,11 +51,6 @@ class HuffmanSuite extends FunSuite {
     println(testTree)
     println(decode(testTree, List(1, 0, 1, 0, 0)))
     println()
-  }
-
-  test ("print that secret french message"){
-    println(frenchCode.toString(0))
-    println(decodedSecret)
   }
 
   test("decode and encode a very short text should be identity") {
