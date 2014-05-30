@@ -41,17 +41,18 @@ object Huffman {
       }
     buildList(fullTree)
   }
-  def makeCodeTree(left: CodeTree, right: CodeTree): CodeTree = {
-      // Fork(left, right, chars(left) ::: chars(right), weight(left) + weight(right))
-      def innerMakeCodeTree(trees: List[CodeTree]): CodeTree = {
-        trees match {
-          case first :: second :: rest => innerMakeCodeTree(Fork(first, second, chars(first) ::: chars(second), weight(first) + weight(second)) :: rest)
-          case first :: Nil => first
-          case Nil => throw new Error("Cannot combine an empty list of trees")
-        }
-      }
-    innerMakeCodeTree(sortTrees(getLeaves(left) ++ getLeaves(right)))
-  }
+  def makeCodeTree(left: CodeTree, right: CodeTree): CodeTree =
+    Fork(left, right, chars(left) ::: chars(right), weight(left) + weight(right))
+  //      def innerMakeCodeTree(trees: List[CodeTree]): CodeTree = {
+  //        trees match {
+  //          case first :: second :: rest => innerMakeCodeTree(Fork(first, second, chars(first) ::: chars(second), weight(first) + weight(second)) :: rest)
+  //          case first :: Nil => first
+  //          case Nil => throw new Error("Cannot combine an empty list of trees")
+  //        }
+  //      }
+  //    innerMakeCodeTree(sortTrees(getLeaves(left) ++ getLeaves(right)))
+  //  }
+
   // Part 2: Generating Huffman trees
 
   /** In this assignment, we are working with lists of characters. This function allows
@@ -86,20 +87,20 @@ object Huffman {
     * println("integer is  : "+ theInt)
     * }
     */
-  def runLengthEncoding[M](inputList: List[M]): List[(M, Int)] = {
-    if (inputList.isEmpty) Nil
-    else {
-      val (packed, rest) = inputList span { input => input == inputList.head }
-      (packed.head, packed.length) :: runLengthEncoding(rest)
-    }
-  }
+  //  def runLengthEncoding[M](inputList: List[M]): List[(M, Int)] = {
+  //    if (inputList.isEmpty) Nil
+  //    else {
+  //      val (packed, rest) = inputList span { input => input == inputList.head }
+  //      (packed.head, packed.length) :: runLengthEncoding(rest)
+  //    }
+  //  }
 
-  def times(chars: List[Char]): List[(Char, Int)] = {
-    val map = runLengthEncoding[Char](chars).toMap
-    val groupedMap = map.groupBy(_._1)
-    val squashedCounts = groupedMap.mapValues(_.map(_._2).sum).toList
-    sort(squashedCounts).reverse
-  }
+  def times(chars: List[Char]): List[(Char, Int)] = sort(chars.foldLeft(Map[Char, Int]())(
+    (map, pair) => {
+      if (map.contains(pair)) map ++ Map[Char, Int]((pair, map(pair) + 1))
+      else map ++ Map[Char, Int]((pair, 1))
+    })
+    .toList).reverse
 
   /** Returns a list of `Leaf` nodes for a given frequency table `freqs`.
     *
@@ -147,10 +148,14 @@ object Huffman {
   }
 
   def combine(trees: List[CodeTree]): List[CodeTree] = {
-    if (trees.length < 1) trees
-    else sortTrees(trees) match {
-      case head :: second :: tail => List(makeCodeTree(head, second)) ::: tail
-      case head :: Nil => List(head)
+    sortTrees(trees) match {
+      case head :: second :: tail => {
+        val result = List(makeCodeTree(head, second)) ::: tail
+        result
+      }
+      case head :: Nil => {
+        List(head)
+      }
       case Nil => Nil
     }
   }
@@ -173,10 +178,7 @@ object Huffman {
     */
   def until(thisIsTrue: List[CodeTree] => Boolean, doThis: List[CodeTree] => List[CodeTree])(trees: List[CodeTree]): List[CodeTree] = {
     if (thisIsTrue(trees)) trees
-    else {
-      println("Until: recieved this non-singleton list: " + trees)
-      until(thisIsTrue, doThis)(doThis(trees))
-    }
+    else until(thisIsTrue, doThis)(doThis(trees))
   }
 
   /** This function creates a code tree which is optimal to encode the text `chars`.
@@ -185,12 +187,8 @@ object Huffman {
     * frequencies from that text and creates a code tree based on them.
     */
   def createCodeTree(chars: List[Char]): CodeTree = {
-    println("create: Will create tree from list: " + chars)
-    val sortedLeaves = makeOrderedLeafList(times(chars))
-    println("create: Sorting them and creating leaves, first: " + sortedLeaves)
-    val result = until(leaves => singleton(leaves), leaves => combine(leaves))(sortedLeaves).head
-    println("create: Result: " + result)
-    result
+    val orderedLeafList = makeOrderedLeafList(times(chars))
+    until(leaves => singleton(leaves), leaves => combine(leaves))(orderedLeafList).head
   }
 
   // Part 3: Decoding

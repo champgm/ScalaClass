@@ -69,19 +69,36 @@ class HuffmanSuite extends FunSuite {
   }
 
   test("official combine test"){
-    println("===Bad Test===")
+    println()
+    println()
+    println("====bad test ====")
     val chars = string2Chars("aabbbdddd")
     val tree = createCodeTree(chars)
 
-    println(tree.toString())
-    println("Fork(Fork(Leaf(a,2),Leaf(b,3),List(a, b),5),Leaf(d,4),List(a, b, d),9)")
-    assert (tree.toString() === "Fork(Fork(Leaf(a,2),Leaf(b,3),List(a, b),5),Leaf(d,4),List(a, b, d),9)")
-    println("==============")
+    assert (tree.toString() === "Fork(Leaf(d,4),Fork(Leaf(a,2),Leaf(b,3),List(a, b),5),List(d, a, b),9)")
   }
 
-  test("offical times test"){
-    val chars = string2Chars("kkdrrrbbbbaaaaa")
-    val timesVal = times(chars)
-    assert (timesVal === List(('a', 5), ('b', 4), ('r', 3), ('k', 2), ('d', 1)))
+  test("offical times test2"){
+    val charList = List('k', 'r', 'k', 'd', 'r', 'r', 'b', 'b', 'b', 'a', 'a', 'a', 'b', 'a', 'a')
+    val targetList = List(('a', 5), ('b', 4), ('r', 3), ('k', 2), ('d', 1))
+    assert(times(charList) === targetList)
+  }
+
+  test("times permutability"){
+    val charList = List('k', 'r', 'k', 'd', 'r', 'r')
+    val targetList = List(('r', 3), ('k', 2), ('d', 1))
+    assert(times(charList) === targetList)
+    charList.permutations.foreach(possible => assert(times(possible) === targetList))
+  }
+
+  test("createCodeTree efficiency") {
+    testCodeTreeEfficiency("someText", 22)
+    testCodeTreeEfficiency("Huffman est cool", 58)
+    testCodeTreeEfficiency("Huffman coding is a compression algorithm that can be used to compress lists of characters.", 373)
+  }
+
+  private def testCodeTreeEfficiency(text: String, length: Int) {
+    val someTextCodeTree = createCodeTree(text.toList)
+    assert(encode(someTextCodeTree)(text.toList).length === length)
   }
 }
