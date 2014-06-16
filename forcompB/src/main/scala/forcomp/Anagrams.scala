@@ -143,6 +143,7 @@ object Anagrams {
     else if ((map(char) - count) == 0) map - char
     else map + ((char, map(char) - count))
   }
+
   /** Returns a list of all anagram sentences of the given sentence.
     *
     * An anagram of a sentence is formed by taking the occurrences of all the characters of
