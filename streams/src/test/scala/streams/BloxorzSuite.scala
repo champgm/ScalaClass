@@ -188,4 +188,29 @@ class BloxorzSuite extends FunSuite {
     }
   }
 
+  trait LevelBAD extends SolutionChecker {
+    val level =
+      """---ooooooo----
+        |---ooooooo----
+        |oooo----------
+        |ooo-----------
+        |ooo-----------
+        |oSo--ooooooooo
+        |ooo--ooooooooo
+        |-----oTo--oooo
+        |-----ooo--oooo""".stripMargin
+  }
+  test("no solution possible") {
+    new LevelBAD {
+      println("Paths from start...")
+      pathsFromStart.take(5).foreach(println(_))
+      println()
+      println("Paths to goal...")
+      pathsToGoal.take(5).foreach(println(_))
+      println()
+      println("Solution...")
+      println(solution)
+    }
+  }
+
 }

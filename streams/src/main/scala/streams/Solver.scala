@@ -90,7 +90,9 @@ trait Solver extends GameDef {
     * position.
     */
   lazy val solution: List[Move] = {
-    pathsToGoal.take(1).head._2.reverse
+    val aSolution = pathsToGoal.take(1)
+    if (aSolution.isEmpty) Nil
+    else aSolution.head._2.reverse
   }
   //pathsToGoal(1)._2.reverse
 }
